@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Task, TaskStatus } from './task.model';
 import { v1 as uuid} from 'uuid';
+import { CreateTaskDTO } from './dto/create-task.dto';
 
 
 @Injectable()
@@ -11,12 +12,26 @@ export class TasksService {
         return this.tasks;
     }
 
-    //add a create task method that takes the title and description as input from the user and generates the uuid
-    createTask(title: string, description: string): Task {
+    getTaskById(id: string): Task {        
+        return this.tasks.find(task => task.id === id);
+    } 
+
+    deleteTaskById(id: string): void {
+        this.tasks = this.tasks.filter(task => task.id !== id);      
+    }
+
+    patchTaskStatus(id: string, status: TaskStatus): Task {
+        const taskToBePatched = this.getTaskById(id);     
+        taskToBePatched.status = status;
+        return taskToBePatched;
+    }
+
+    createTask(createTaskDTO: CreateTaskDTO): Task {
+        const { title, description } = createTaskDTO;
         const newTask: Task = {
             id: uuid(),
-            title,
-            description,
+            title: title,
+            description: description,
             status: TaskStatus.OPEN
         };
 
